@@ -1,6 +1,8 @@
 #pragma once
 #include "tile.h"
 #include <vector>
+#include <functional>
+#include <string>
 
 struct Map
 {
@@ -12,6 +14,22 @@ struct Map
 
 	std::vector<std::vector<Tile>> map;
 
-	void GenerateMap(Texture& texture);
-	void Map::DrawMap();
+	void GenerateMap();
+	void DrawMap();
+	void AutoTile();
+	void IterateMap(std::function<void(int x, int y)> functionX, std::function<void()> functionY = nullptr);
+	void SetTileTextures();
+	Vector2 GetTileFromPos(float x, float y);
+	Vector2 GetPosFromTile(int x, int y);
+	void DrawGrid();
+
+
+	//RULES
+	int horizonLine = 50;
+
+	void DecideTileType();
+
+private:
+	void CheckAutoTileRules(int x, int y);
+	TileType CheckGenerationRules(int x, int y);
 };
