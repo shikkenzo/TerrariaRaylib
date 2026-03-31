@@ -25,7 +25,7 @@ void Map::DrawMap()
 		for (int x = 0; x < tileCountX; x++)
 		{
 			Tile tile = map[y][x];
-			DrawTexture(tile.tileTexture, tile.posX, tile.posY, WHITE);
+			tile.DrawTile({tile.posX, tile.posY});
 		}
 	}
 }

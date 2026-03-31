@@ -27,15 +27,15 @@ int main ()
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
 
-	Texture wabbit = LoadTexture("wabbit_alpha.png");
+	Texture dirtAtlas = LoadTexture("PC _ Computer - Terraria - Tiles - Dirt.png");
 
 	Map map;
 	map.startPos =  {-(screenWidth / 2.f), (screenWidth / 4.f) };
-	map.tileCountX = 100;
-	map.tileCountY = 20;
-	map.tileWidth = wabbit.width;
-	map.tileHeight = wabbit.height;
-	map.GenerateMap(wabbit);
+	map.tileCountX = 150;
+	map.tileCountY = 40;
+	map.tileWidth = (dirtAtlas.width / 16) - 2;
+	map.tileHeight = (dirtAtlas.height / 15) - 2;
+	map.GenerateMap(dirtAtlas);
 
 	Camera2D camera = { 0 };
 	camera.offset = Vector2{ screenWidth / 2.0f, screenHeight / 2.0f };
@@ -50,7 +50,7 @@ int main ()
 		BeginDrawing();
 
 		// Setup the back buffer for drawing (clear color and depth buffers)
-		ClearBackground(BLACK);
+		ClearBackground(SKYBLUE);
 		
 		BeginMode2D(camera);
 		map.DrawMap();
@@ -62,7 +62,7 @@ int main ()
 
 	// cleanup
 	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
+	UnloadTexture(dirtAtlas);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();
