@@ -34,12 +34,15 @@ int main ()
 	SendTextures({dirtAtlas});
 
 	Map map;
-	map.tileCountX = 150;
-	map.tileCountY = 100;
+	map.tileCountX = 350;
+	map.tileCountY = 300;
+	map.horizonLine = map.tileCountY / 2;
 	map.tileWidth = (dirtAtlas.width / 16) - 2.f;
 	map.tileHeight = (dirtAtlas.height / 15) - 2.f;
 	map.startPos =  {-(map.tileWidth * map.tileCountX / 2.f), -(map.tileHeight * map.tileCountY / 2.f) };
+	map.perlinNoiseStrength = 50.f;
 	map.GenerateMap();
+	map.ApplyPerlinNoise();
 	map.DecideTileType();
 	//map.AutoTile();
 	map.SetTileTextures();
@@ -47,8 +50,10 @@ int main ()
 	Camera2D camera = { 0 };
 	camera.offset = { (screenWidth / 2.f), (screenHeight / 2.f) };
 	camera.rotation = 0.0f;
-	camera.zoom = 1.f;
+	camera.zoom = 0.25f;
 	camera.target = { 0, 0};
+	
+	int i = 0;
 
 
 	// game loop
@@ -57,8 +62,9 @@ int main ()
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
 			auto p = GetScreenToWorld2D(GetMousePosition(), camera);
-			std::cout << map.GetTileFromPos(p.x, p.y).x << " + " << map.GetTileFromPos(p.x, p.y).y << std::endl;
+			//std::cout << map.GetTileFromPos(p.x, p.y).x << " + " << map.GetTileFromPos(p.x, p.y).y << std::endl;
 			//std::cout << p.x << std::endl;
+			std::cout << map.horizon[i++] << std::endl;
 		}
 
 
@@ -70,7 +76,7 @@ int main ()
 		
 			BeginMode2D(camera);
 				map.DrawMap();
-				map.DrawGrid();
+				//map.DrawGrid();
 			EndMode2D();
 
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)

@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include <string>
+#include <iostream>
 
 struct Map
 {
@@ -14,10 +15,14 @@ struct Map
 
 	std::vector<std::vector<Tile>> map;
 
+	float perlinNoiseStrength = 10.f;
+
 	void GenerateMap();
+	void IterateMap(std::function<void(int x, int y)> functionX, std::function<void()> functionY = nullptr);
+	void DecideTileType();
+	void ApplyPerlinNoise();
 	void DrawMap();
 	void AutoTile();
-	void IterateMap(std::function<void(int x, int y)> functionX, std::function<void()> functionY = nullptr);
 	void SetTileTextures();
 	Vector2 GetTileFromPos(float x, float y);
 	Vector2 GetPosFromTile(int x, int y);
@@ -26,8 +31,7 @@ struct Map
 
 	//RULES
 	int horizonLine = 50;
-
-	void DecideTileType();
+	std::vector<int> horizon;
 
 private:
 	void CheckAutoTileRules(int x, int y);

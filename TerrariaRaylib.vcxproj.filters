@@ -47,6 +47,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="resources\PC _ Computer - Terraria - Tiles - Dirt.png">
+      <Filter>Game Resource Files</Filter>
+    </Image>
     <Image Include="resources\wabbit_alpha.png">
       <Filter>Game Resource Files</Filter>
     </Image>

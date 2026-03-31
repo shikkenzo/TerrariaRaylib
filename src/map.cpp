@@ -15,6 +15,11 @@ void Map::GenerateMap()
 			tile.y = y; //?
 
 			row.push_back(tile);
+
+			if (y == 0)
+			{
+				horizon.push_back(horizonLine);
+			}
 		}
 		map.push_back(row);
 	}
@@ -31,6 +36,54 @@ void Map::IterateMap(std::function<void(int x, int y)> functionX, std::function<
 		
 		if (functionY) functionY();
 	}
+}
+
+void Map::DecideTileType()
+{
+	IterateMap([this](int x, int y)
+		{
+			map[y][x].type = CheckGenerationRules(x, y);
+		});
+}
+
+TileType Map::CheckGenerationRules(int x, int y)
+{
+	//CHECK HORIZON
+
+	TileType result = AIR;
+
+	if (y > horizon[x])
+	{
+		result = DIRT;
+	}
+	else
+	{
+		result = AIR;
+	}
+
+	return result;
+}
+
+void Map::ApplyPerlinNoise()
+{
+	Image noise = GenImagePerlinNoise(tileCountX, tileCountY, 0, 0, 1);
+	ExportImage(noise, "perlinRaylib.png");
+
+	Color* pixels = LoadImageColors(noise);
+
+	IterateMap([this, pixels](int x, int y)
+		{
+			if (y != 0) return;
+			Tile tile = map[y][x];
+
+			Color c = pixels[x + (y * tileCountX)];
+
+			int heightDiff = (c.r / 255.f) * perlinNoiseStrength;
+
+			horizon[x] += heightDiff;
+			std::cout << horizon[x] << std::endl;
+		}
+	);
 }
 
 void Map::DrawMap()
@@ -61,20 +114,6 @@ void Map::CheckAutoTileRules(int x, int y)
 	if (y < tileCountY) Tile bottom = map[y+1][x];
 	if (x > 0) Tile left = map[y][x-1];
 	if (x < tileCountX) Tile right = map[y][x+1];
-}
-
-void Map::DecideTileType()
-{
-	IterateMap([this](int x, int y)
-		{
-			map[y][x].type = CheckGenerationRules(x, y);
-		});
-}
-
-TileType Map::CheckGenerationRules(int x, int y)
-{
-	if (y < horizonLine) return AIR;
-	if (y >= horizonLine) return DIRT;
 }
 
 void Map::SetTileTextures()
