@@ -301,13 +301,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\collisionSystem.h" />
     <ClInclude Include="include\map.h" />
+    <ClInclude Include="include\player.h" />
     <ClInclude Include="include\resource_dir.h" />
     <ClInclude Include="include\tile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\collisionSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\map.cpp" />
+    <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\tile.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -318,6 +322,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\PC _ Computer - Terraria - Tiles - Dirt.png" />
+    <Image Include="resources\perlinRaylib.png" />
     <Image Include="resources\wabbit_alpha.png" />
   </ItemGroup>
   <ItemGroup>

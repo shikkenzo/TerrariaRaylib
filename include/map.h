@@ -28,7 +28,6 @@ struct Map
 	Vector2 GetPosFromTile(int x, int y);
 	void DrawGrid();
 
-
 	//RULES
 	int horizonLine = 50;
 	std::vector<int> horizon;

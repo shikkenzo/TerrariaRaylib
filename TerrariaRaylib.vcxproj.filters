@@ -18,12 +18,16 @@
     <ClInclude Include="include\map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\resource_dir.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\tile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\collisionSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -32,9 +36,13 @@
     <ClCompile Include="src\map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\tile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\collisionSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\icon.ico">
@@ -48,6 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\PC _ Computer - Terraria - Tiles - Dirt.png">
+      <Filter>Game Resource Files</Filter>
+    </Image>
+    <Image Include="resources\perlinRaylib.png">
       <Filter>Game Resource Files</Filter>
     </Image>
     <Image Include="resources\wabbit_alpha.png">

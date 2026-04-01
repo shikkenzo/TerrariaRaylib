@@ -81,7 +81,7 @@ void Map::ApplyPerlinNoise()
 			int heightDiff = (c.r / 255.f) * perlinNoiseStrength;
 
 			horizon[x] += heightDiff;
-			std::cout << horizon[x] << std::endl;
+			//std::cout << horizon[x] << std::endl;
 		}
 	);
 }
