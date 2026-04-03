@@ -104,7 +104,7 @@ int main ()
 				int collisionDirection;
 				if (CheckCollisionAABB(tileCollision, player.collision, collisionDirection))
 				{
-					std::cout << "collision" << std::endl;
+					//std::cout << "collision" << std::endl;
 					ResolvePlayerCollision(player, tileCollision, collisionDirection);
 					if (collisionDirection == 3) player.canJump = true;
 				}

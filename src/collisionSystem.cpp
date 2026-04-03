@@ -62,19 +62,27 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	switch (collisionDirection)
 	{
 	case(0):
-		p.position.x = bRight + a.width / 2;
+ 		p.position.x = bRight + a.width / 2;
+
+		if (p.velocity.x < 0) //if going left
 		p.velocity.x = 0;
 		break;
 	case(1):
 		p.position.x = bLeft - a.width / 2;
+
+		if (p.velocity.x > 0) //if going right
 		p.velocity.x = 0;
 		break;
 	case(2):
 		p.position.y = bBottom + a.height / 2;
+
+		if (p.velocity.y < 0) //if jumping
 		p.velocity.y = 0;
 		break;
 	case(3):
 		p.position.y = bTop - a.height / 2;
+
+		if (p.velocity.y > 0) //if falling
 		p.velocity.y = 0;
 		break;
 
