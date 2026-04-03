@@ -8,9 +8,10 @@ struct Player
 	Rectangle collision = { 0, 0, 20.f, 20.f };
 	Vector2 position = { 0.f, 0.f };
 	float baseSpeed = 500.f;
-	float jumpSpeed = 5.f;
+	float jumpSpeed = 4.f;
 	bool canJump = false;
 	float baseFallingAccel = 9.8f;
+	float currentFallingAccel = baseFallingAccel;
 	float fallingAccelMultiplier = 2.f;
 	Vector2 velocity = {};
 
@@ -18,4 +19,5 @@ struct Player
 	void Player::Jump();
 	void AdjustCollider();
 	void Draw();
+	void AdjustFallingSpeed();
 };

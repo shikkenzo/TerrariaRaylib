@@ -5,7 +5,7 @@ void Player::CalculateVelocity(Vector2 input, float deltaTime)
 {
 	Vector2 l_addedMovement = { 0, 0 };
 	
-	l_addedMovement.y += baseFallingAccel * deltaTime;
+	l_addedMovement.y += currentFallingAccel * deltaTime;
 	l_addedMovement.x += Vector2Normalize(input).x * baseSpeed * deltaTime;
 
 	velocity.y += l_addedMovement.y;
@@ -32,4 +32,16 @@ void Player::AdjustCollider()
 void Player::Draw()
 {
 	DrawRectangle(collision.x, collision.y, collision.width, collision.height, DARKBLUE);
+}
+
+void Player::AdjustFallingSpeed()
+{
+	if (velocity.y > 0)
+	{
+		currentFallingAccel = baseFallingAccel * fallingAccelMultiplier;
+	}
+	else
+	{
+		currentFallingAccel = baseFallingAccel;
+	}
 }

@@ -83,6 +83,7 @@ int main ()
 		{
 			player.Jump();
 		}
+		player.AdjustFallingSpeed();
 		
 
 		player.CalculateVelocity(playerInput, GetFrameTime());
