@@ -13,6 +13,27 @@ void Tile::SetTexture()
 	}
 }
 
+void Tile::SetCollision(Rectangle tileCollision)
+{
+	if (type == AIR)
+	{
+		collidable = false;
+	}
+	else
+	{
+		collidable = true;
+	}
+
+	if (collidable)
+	{
+		collision = tileCollision;
+	}
+	else
+	{
+		collision = {};
+	}
+}
+
 void SendTextures(std::vector<Texture> t)
 {
 	for (int i = 0; i < std::size(t); i++)

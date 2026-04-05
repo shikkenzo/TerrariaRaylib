@@ -23,6 +23,12 @@ void Player::Jump()
 	}
 }
 
+void Player::MoveTo(Vector2 newPosition)
+{
+	position = newPosition;
+	AdjustCollider();
+}
+
 void Player::AdjustCollider()
 {
 	collision.x = position.x - collision.width / 2;

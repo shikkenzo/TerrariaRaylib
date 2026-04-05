@@ -8,11 +8,8 @@ void Map::GenerateMap()
 		for (int x = 0; x < tileCountX; x++)
 		{
 			Tile tile;
-			tile.drawingPosX = startPos.x + x * tileWidth + (1 / 2) * tileWidth;
-			tile.drawingPosY = startPos.y + y * tileHeight + (1 / 2) * tileHeight;
-			
-			tile.x = x; //?
-			tile.y = y; //?
+			tile.x = x;
+			tile.y = y;
 
 			row.push_back(tile);
 
@@ -23,18 +20,60 @@ void Map::GenerateMap()
 		}
 		map.push_back(row);
 	}
+
+	ApplyPerlinNoiseY();
+	//ApplyPerlinNoiseX();
+	DecideTileType();
+	SetTileTextures();
+	AutoTile();
 }
 
-void Map::IterateMap(std::function<void(int x, int y)> functionX, std::function<void()> functionY)
+void Map::GenerateMapDebug()
 {
 	for (int y = 0; y < tileCountY; y++)
 	{
+		std::vector<Tile> row;
+		for (int x = 0; x < tileCountX; x++)
+		{
+			Tile tile;
+			tile.x = x;
+			tile.y = y;
+			row.push_back(tile);
+
+			if (y == 0)
+			{
+				horizon.push_back(horizonLine);
+			}
+		}
+		map.push_back(row);
+	}
+
+	ApplyPerlinNoiseY();
+	DecideTileType();
+	ApplyPerlinNoiseX();
+	//DecideTileType();
+	SetTileTextures();
+	AutoTile();
+}
+
+void Map::ClearMap()
+{
+	IterateMap([this](int x, int y)
+		{
+			map[y][x].type = AIR;
+		});
+}
+
+void Map::IterateMap(std::function<void(int x, int y)> functionX, std::function<void(int y)> functionY)
+{
+	for (int y = 0; y < tileCountY; y++)
+	{
+		if (functionY) functionY(y);
+
 		for (int x = 0; x < tileCountX; x++)
 		{
 			functionX(x, y);
 		}
-		
-		if (functionY) functionY();
 	}
 }
 
@@ -42,17 +81,21 @@ void Map::DecideTileType()
 {
 	IterateMap([this](int x, int y)
 		{
-			map[y][x].type = CheckGenerationRules(x, y);
+			Tile& tile = map[y][x];
+			tile.type = CheckGenerationRules(x, y);
+			tile.SetCollision({ tile.drawingPosX, tile.drawingPosY, tileWidth, tileHeight });
 		});
 }
 
 TileType Map::CheckGenerationRules(int x, int y)
 {
-	//CHECK HORIZON
-
 	TileType result = AIR;
 
-	if (y > horizon[x])
+	if (y == horizon[x])
+	{
+		result = GRASS;
+	}
+	else if (y > horizon[x])
 	{
 		result = DIRT;
 	}
@@ -64,7 +107,7 @@ TileType Map::CheckGenerationRules(int x, int y)
 	return result;
 }
 
-void Map::ApplyPerlinNoise()
+void Map::ApplyPerlinNoiseY()
 {
 	Image noise = GenImagePerlinNoise(tileCountX, tileCountY, 0, 0, 1);
 	ExportImage(noise, "perlinRaylib.png");
@@ -80,17 +123,73 @@ void Map::ApplyPerlinNoise()
 
 			int heightDiff = (c.r / 255.f) * perlinNoiseStrength;
 
-			horizon[x] += heightDiff;
+			horizon[x] = horizonLine - heightDiff;
 			//std::cout << horizon[x] << std::endl;
 		}
 	);
 }
 
+void Map::ApplyPerlinNoiseX()
+{
+	Image noise = GenImagePerlinNoise(tileCountX, tileCountY, 0, 0, 1);
+	ExportImage(noise, "perlinRaylib.png");
+
+	Color* pixels = LoadImageColors(noise);
+	Color c;
+
+	int n = tileCountX * tileCountX;
+	int average = 0;
+
+	IterateMap([this, pixels, c, &average](int x, int y)
+		{
+			Tile& tile = map[y][x];
+
+			if (y >= horizonLine) return;
+			int widthDisplacement = (c.r / 255.f) * (horizonLine / (float)y) * 50.f;
+
+			if (CheckTile(x - widthDisplacement, y))
+			{
+				//std::cout << widthDisplacement << std::endl;
+
+				map[y][x - widthDisplacement].type = tile.type;
+				tile.type = AIR;
+			}
+
+			//tile.x -= widthDisplacement;
+			//average += widthDisplacement;
+			//std::cout << horizon[x] << std::endl;
+		},
+		[this, pixels, &c](int y)
+		{
+			c = pixels[y * tileCountX];
+			//std::cout << (int)((c.r / 255.f) * 200.f) << std::endl;
+		}
+	);
+
+	//average /= n;
+
+	//IterateMap([this, pixels, c, &average](int x, int y)
+	//	{
+	//		Tile& tile = map[y][x];
+	//		if (tile.y > horizonLine) return;
+
+	//		int widthDisplacement = 100;
+
+	//		tile.x += widthDisplacement;
+	//		//std::cout << horizon[x] << std::endl;
+	//	}
+	//);
+}
+
 void Map::DrawMap()
 {
-	IterateMap([this](int x, int y) 
+	IterateMap([this](int x, int y)
 		{
-			Tile tile = map[y][x];
+			Tile& tile = map[y][x];
+
+			tile.drawingPosX = startPos.x + tile.x * tileWidth + (1 / 2) * tileWidth;
+			tile.drawingPosY = startPos.y + tile.y * tileHeight + (1 / 2) * tileHeight;
+
 			if (tile.type != AIR)
 			{
 				tile.DrawTile({ tile.drawingPosX, tile.drawingPosY });
@@ -102,18 +201,111 @@ void Map::AutoTile()
 {
 	IterateMap([this](int x, int y)
 		{
-			CheckAutoTileRules(x, y);
+			Tile& tile = map[y][x];
+			tile.tileAtlasPos = CheckAutoTileRules(x, y);
 		});
 }
 
-void Map::CheckAutoTileRules(int x, int y)
+void Map::GetAdjacentTiles(Tile tile, Tile& outTop, Tile& outBottom, Tile& outLeft, Tile& outRight)
+{
+	int x = tile.x;
+	int y = tile.y;
+
+	if (y > 0) outTop = map[y - 1][x];
+	else outTop.valid = 0;
+
+	if (y < tileCountY - 1) outBottom = map[y + 1][x];
+	else outBottom.valid = 0;
+
+	if (x > 0) outLeft = map[y][x - 1];
+	else outLeft.valid = 0;
+
+	if (x < tileCountX - 1) outRight = map[y][x + 1];
+	else outRight.valid = 0;
+}
+
+bool Map::CheckTile(int x, int y)
+{
+	if (
+		y < 0 ||
+		y >= tileCountY ||
+		x < 0 ||
+		x >= tileCountX
+		)
+		return false;
+}
+
+Vector2 Map::CheckAutoTileRules(int x, int y)
 {
 	Tile tile = map[y][x];
+	Tile t;
+	Tile b;
+	Tile l;
+	Tile r;
 
-	if (y > 0) Tile top = map[y-1][x];
-	if (y < tileCountY) Tile bottom = map[y+1][x];
-	if (x > 0) Tile left = map[y][x-1];
-	if (x < tileCountX) Tile right = map[y][x+1];
+	GetAdjacentTiles(tile, t, b, l, r);
+
+	TileType top = t.type;
+	TileType bottom = b.type;
+	TileType left = l.type;
+	TileType right = r.type;
+
+	if (tile.type == DIRT)
+	{
+		if (top == AIR && left == DIRT && right == DIRT)
+		{
+			return { 1, 0 };
+		}
+		else if (top == AIR && left == DIRT && right == AIR)
+		{
+			return { 1, 3 };
+		}
+		else if (top == AIR && left == AIR && right == DIRT)
+		{
+			return { 0, 3 };
+		}
+		else
+		{
+			return { 0, 5 };
+		}
+	}
+	else if (tile.type == GRASS)
+	{
+		if (top == AIR && left == GRASS && right == GRASS && bottom == DIRT)
+		{
+			return { 1, 0 };
+		}
+		else if (top == AIR && left == GRASS && right == AIR && bottom == DIRT)
+		{
+			return { 1, 3 };
+		}
+		else if (top == AIR && left == AIR && right == GRASS && bottom == DIRT)
+		{
+			return { 0, 3 };
+		}
+
+		else if (top == AIR && left == GRASS && right == DIRT && bottom == DIRT)
+		{
+			return { 1, 0 };
+		}
+		else if (top == AIR && left == DIRT && right == GRASS && bottom == DIRT)
+		{
+			return { 1, 0 };
+		}
+		else if (top == AIR && left == AIR && right == AIR && bottom == DIRT)
+		{
+			return { 6, 5 };
+		}
+
+		else
+		{
+			return { 1, 1 };
+		}
+	}
+	else
+	{
+		return { 0, 0 };
+	}
 }
 
 void Map::SetTileTextures()
@@ -126,27 +318,38 @@ void Map::SetTileTextures()
 
 void Map::DrawGrid()
 {
-	IterateMap([this](int x, int y)
-		{
-			Tile tile = map[y][x];
+	//IterateMap([this](int x, int y)
+	//	{
+	//		Tile tile = map[y][x];
 
-			DrawLine(0, tile.drawingPosY, tile.drawingPosX, tile.drawingPosY, WHITE);
-			DrawLine(tile.drawingPosX, 0, tile.drawingPosX, tile.drawingPosY, WHITE);
+	//		DrawLine(0, tile.drawingPosY, tile.drawingPosX, tile.drawingPosY, WHITE);
+	//		DrawLine(tile.drawingPosX, 0, tile.drawingPosX, tile.drawingPosY, WHITE);
 
-			DrawCircle(GetPosFromTile(x, y).x, GetPosFromTile(x, y).y, 2, BLUE);
-			//DrawText(std::to_string(x).c_str(), GetPosFromTile(x, y).x, GetPosFromTile(x, y).y, 2, WHITE);
-			//DrawText(std::to_string(y).c_str(), GetPosFromTile(x, y).x, GetPosFromTile(x, y).y, 2, WHITE);
+	//		DrawCircle(GetPosFromTile(x, y).x, GetPosFromTile(x, y).y, 2, BLUE);
+	//		//DrawText(std::to_string(x).c_str(), GetPosFromTile(x, y).x, GetPosFromTile(x, y).y, 2, WHITE);
+	//		//DrawText(std::to_string(y).c_str(), GetPosFromTile(x, y).x, GetPosFromTile(x, y).y, 2, WHITE);
 
-		});
+	//	});
 
 	DrawLine(-GetScreenWidth(), 0, GetScreenWidth(), 0, BLACK);
 	DrawLine(0, -GetScreenHeight(), 0, GetScreenHeight(), BLACK);
 	DrawCircle(0, 0, 10, RED);
 }
 
-Vector2 Map::GetTileFromPos(float x, float y)
+Vector2 Map::GetWordTileCoordFromPos(float posX, float posY)
 {
-	return { std::floor(x / tileWidth), std::floor(y / tileHeight) };
+	float x = std::floor(posX / tileWidth);
+	float y = std::floor(posY / tileHeight);
+
+	return { x, y };
+}
+
+Vector2 Map::GetTileFromPos(float posX, float posY)
+{
+	float x = std::floor((posX - startPos.x) / tileWidth);
+	float y = std::floor((posY - startPos.y) / tileHeight);
+
+	return { x, y };
 }
 
 Vector2 Map::GetPosFromTile(int x, int y)

@@ -16,7 +16,7 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "player.h"
 #include "collisionSystem.h"
 
-int main ()
+int main()
 {
 	// Tell the window to use vsync and work on high DPI displays
 	//SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
@@ -31,32 +31,32 @@ int main ()
 	SearchAndSetResourceDir("resources");
 
 	Texture dirtAtlas = LoadTexture("PC _ Computer - Terraria - Tiles - Dirt.png");
-	Texture airTexture = LoadTexture("PC _ Computer - Terraria - Tiles - Dirt.png");
-	
-	SendTextures({dirtAtlas});
+	Texture grassAtlas = LoadTexture("Terraria - Tiles - Grass.png");
 
-	Map map;
-	map.tileCountX = 350;
-	map.tileCountY = 300;
-	map.horizonLine = map.tileCountY / 2;
-	map.tileWidth = (dirtAtlas.width / 16) - 2.f;
-	map.tileHeight = (dirtAtlas.height / 15) - 2.f;
-	map.startPos =  {-(map.tileWidth * map.tileCountX / 2.f), -(map.tileHeight * map.tileCountY / 2.f) };
-	map.perlinNoiseStrength = 50.f;
-	map.GenerateMap();
-	map.ApplyPerlinNoise();
-	map.DecideTileType();
-	//map.AutoTile();
-	map.SetTileTextures();
+
+	SendTextures({ dirtAtlas, grassAtlas });
+
+	int tileCountX = 350;
+	int tileCountY = 300;
+	int horizonBase = tileCountY / 2;
+	int tileWidth = 16;
+	int tileHeight = 15;
+	Vector2 startPos = { -(tileWidth * tileCountX / 2.f), -(tileHeight * tileCountY / 2.f) };
+	float perlinStrength = 150.f;
+
+	Map map = Map(tileCountX, tileCountY, horizonBase, tileWidth, tileHeight, startPos, perlinStrength);
+
+	map.GenerateMapDebug();
 
 	Player player;
+	player.MoveTo({ 0.f, -((float)tileCountY / 4 * (float)tileHeight) });
 
 	Camera2D camera = { 0 };
 	camera.offset = { (screenWidth / 2.f), (screenHeight / 2.f) };
 	camera.rotation = 0.0f;
-	camera.zoom = 1.f;
+	camera.zoom = 0.75f;
 	camera.target = player.position;
-	
+
 	int i = 0;
 
 	// game loop
@@ -64,11 +64,19 @@ int main ()
 	{
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
-			auto p = GetScreenToWorld2D(GetMousePosition(), camera);
-			//std::cout << map.GetTileFromPos(p.x, p.y).x << " + " << map.GetTileFromPos(p.x, p.y).y << std::endl;
-			//std::cout << p.x << std::endl;
-			//std::cout << map.horizon[i++] << std::endl;
+			Vector2 p = GetScreenToWorld2D(GetMousePosition(), camera);
+
+			int x = map.GetTileFromPos(p.x, p.y).x;
+			int y = map.GetTileFromPos(p.x, p.y).y;
+
+			if (map.CheckTile(x, y))
+			{
+				std::cout << x << " + " << y << ", " << map.map[y][x].type << ", " << map.map[y][x].collidable << std::endl;
+				//std::cout << map.horizon[i++] << std::endl;
+			}
 		}
+
+
 
 		Vector2 playerInput = { 0, 0 };
 		if (IsKeyDown(KEY_A))
@@ -83,18 +91,17 @@ int main ()
 		{
 			player.Jump();
 		}
+		if (IsKeyPressed(KEY_R))
+		{
+			map.ClearMap();
+			map.GenerateMapDebug();
+		}
 		player.AdjustFallingSpeed();
-		
+
 
 		player.CalculateVelocity(playerInput, GetFrameTime());
 
-		// Move X
-		player.position.x += player.velocity.x;
-
-		// Move Y
-		player.position.y += player.velocity.y;
-
-		player.AdjustCollider();
+		player.MoveTo(player.position + player.velocity);
 
 		map.IterateMap([map, &player](int x, int y)
 			{
@@ -107,10 +114,11 @@ int main ()
 				{
 					//std::cout << "collision" << std::endl;
 					ResolvePlayerCollision(player, tileCollision, collisionDirection);
-					if (collisionDirection == 3) player.canJump = true;
+					if (collisionDirection == 3) player.isGrounded = true;
+					else player.isGrounded = false;
+
+					if (player.isGrounded) player.canJump = true;
 				}
-
-
 			});
 
 		// drawing
