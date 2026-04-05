@@ -103,17 +103,17 @@ int main()
 
 		player.MoveTo(player.position + player.velocity);
 
-		map.IterateMap([map, &player](int x, int y)
+		map.IterateMap([&map, &player](int x, int y)
 			{
-				Tile tile = map.map[y][x];
-				Rectangle tileCollision = { tile.drawingPosX, tile.drawingPosY, map.tileWidth, map.tileHeight };
+				Tile& tile = map.map[y][x];
+				tile.collision = { tile.drawingPosX, tile.drawingPosY, map.tileWidth, map.tileHeight };
 				if (tile.type == AIR) return;
 
 				int collisionDirection;
-				if (CheckCollisionAABB(tileCollision, player.collision, collisionDirection))
+				if (CheckCollisionAABB(tile.collision, player.collision, collisionDirection))
 				{
 					//std::cout << "collision" << std::endl;
-					ResolvePlayerCollision(player, tileCollision, collisionDirection);
+					ResolvePlayerCollision(player, tile.collision, collisionDirection);
 					if (collisionDirection == 3) player.isGrounded = true;
 					else player.isGrounded = false;
 
@@ -137,8 +137,8 @@ int main()
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
-			Rectangle collisionAABB = { 0.f, -((float)tileCountY / 3 * (float)tileHeight), 100.f, 100.f };
-			Vector2 collisionPos = { collisionAABB.x + collisionAABB.width / 2, collisionAABB.y + collisionAABB.height / 2 };
+			/*Rectangle collisionAABB = { 0.f, -((float)tileCountY / 3 * (float)tileHeight), 100.f, 100.f };
+			Vector2 collisionPos = { collisionAABB.x + collisionAABB.width / 2, collisionAABB.y + collisionAABB.height / 2 };*/
 
 			Vector2 cursorPos = GetScreenToWorld2D(GetMousePosition(), camera);
 			Vector2 cursorCollisionPos = cursorPos - Vector2{ player.collision.width / 2,  player.collision.height / 2 };
@@ -146,27 +146,36 @@ int main()
 
 			Vector2 magnitudeVector = { cursorPos - Vector2{player.position.x, player.position.y} };
 
-			Vector2 sumPos = collisionPos;
-			Rectangle sum = { sumPos.x, sumPos.y, (collisionAABB.width / 2 + cursorCollision.width / 2) * 2, (collisionAABB.height / 2 + cursorCollision.width / 2) * 2 };
-			sum.x -= sum.width / 2;
-			sum.y -= sum.height / 2;
+			map.IterateMap([map, camera, player, tileCountY, tileHeight, cursorCollision, magnitudeVector](int x, int y)
+				{
+					Tile tile = map.map[y][x];
+					if (tile.type == AIR || tile.type == DIRT) return;
 
-			float startPos[DIMENSIONS] = { player.position.x, player.position.y };
-			float magnitude[DIMENSIONS] = { magnitudeVector.x, magnitudeVector.y };
-			float collisionSum[DIMENSIONS * 2] = { sum.x, sum.y, sum.width, sum.height };
-			Hit hit = ShapecastAABB(startPos, magnitude, collisionSum);
-			if (hit.isHit)
-			{
-				std::cout << "shapecast" << std::endl;
-				DrawRectangle(hit.position.x - player.collision.width / 2, hit.position.y - player.collision.height / 2, player.collision.width, player.collision.height, RED);
-				DrawLine(startPos[0], startPos[1], hit.position.x, hit.position.y, RED);
-			}
+					Rectangle collisionAABB = { tile.collision.x, tile.collision.y, tile.collision.width, tile.collision.height };
+					Vector2 collisionPos = { collisionAABB.x + collisionAABB.width / 2, collisionAABB.y + collisionAABB.height / 2 };
 
-			DrawRectangle(cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height, GREEN);
-			DrawRectangle(sum.x, sum.y, sum.width, sum.height, GRAY);
-			DrawRectangle(collisionAABB.x, collisionAABB.y, collisionAABB.width, collisionAABB.height, DARKGRAY);
-			DrawCircle(collisionPos.x, collisionPos.y, 10, BLUE);
+					Vector2 sumPos = collisionPos;
+					Rectangle sum = { sumPos.x, sumPos.y, (collisionAABB.width / 2 + cursorCollision.width / 2) * 2, (collisionAABB.height / 2 + cursorCollision.width / 2) * 2 };
+					sum.x -= sum.width / 2;
+					sum.y -= sum.height / 2;
 
+					float startPos[DIMENSIONS] = { player.position.x, player.position.y };
+					float magnitude[DIMENSIONS] = { magnitudeVector.x, magnitudeVector.y };
+					float collisionSum[DIMENSIONS * 2] = { sum.x, sum.y, sum.width, sum.height };
+					Hit hit = ShapecastAABB(startPos, magnitude, collisionSum);
+					if (hit.isHit)
+					{
+						std::cout << "shapecast" << std::endl;
+						DrawRectangle(hit.position.x - player.collision.width / 2, hit.position.y - player.collision.height / 2, player.collision.width, player.collision.height, RED);
+						DrawLine(startPos[0], startPos[1], hit.position.x, hit.position.y, RED);
+					}
+
+					DrawRectangle(sum.x, sum.y, sum.width, sum.height, GRAY);
+					DrawRectangle(collisionAABB.x, collisionAABB.y, collisionAABB.width, collisionAABB.height, DARKGRAY);
+					DrawCircle(collisionPos.x, collisionPos.y, 10, BLUE);
+				});
+
+					DrawRectangle(cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height, GREEN);
 		}
 
 		EndMode2D();

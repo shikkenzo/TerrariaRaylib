@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 #include <iostream>
-#include <optional> //?
+#include <optional>
 
 struct Map
 {
@@ -18,7 +18,6 @@ struct Map
 		startPos = _startPos;
 		perlinNoiseStrength = _perlinStrength;
 	}
-	Map() {};
 	Vector2 startPos;
 	float tileHeight;
 	float tileWidth;
