@@ -146,7 +146,9 @@ int main()
 
 			Vector2 magnitudeVector = { cursorPos - Vector2{player.position.x, player.position.y} };
 
-			map.IterateMap([map, camera, player, tileCountY, tileHeight, cursorCollision, magnitudeVector](int x, int y)
+			Hit hit;
+			Vector2 closerHitPos = hit.position;
+			map.IterateMap([map, camera, player, tileCountY, tileHeight, cursorCollision, magnitudeVector, &hit, &closerHitPos](int x, int y)
 				{
 					Tile tile = map.map[y][x];
 					if (tile.type == AIR || tile.type == DIRT) return;
@@ -162,20 +164,23 @@ int main()
 					float startPos[DIMENSIONS] = { player.position.x, player.position.y };
 					float magnitude[DIMENSIONS] = { magnitudeVector.x, magnitudeVector.y };
 					float collisionSum[DIMENSIONS * 2] = { sum.x, sum.y, sum.width, sum.height };
-					Hit hit = ShapecastAABB(startPos, magnitude, collisionSum);
+					hit = ShapecastAABB(startPos, magnitude, collisionSum);
 					if (hit.isHit)
 					{
-						std::cout << "shapecast" << std::endl;
-						DrawRectangle(hit.position.x - player.collision.width / 2, hit.position.y - player.collision.height / 2, player.collision.width, player.collision.height, RED);
+						if (Vector2LengthSqr(hit.position - player.position) < Vector2LengthSqr(closerHitPos - player.position)) closerHitPos = hit.position;
+						//std::cout << "shapecast" << std::endl;
 						DrawLine(startPos[0], startPos[1], hit.position.x, hit.position.y, RED);
+						DrawRectangle(hit.position.x - player.collision.width / 2, hit.position.y - player.collision.height / 2, player.collision.width, player.collision.height, RED);
 					}
 
-					DrawRectangle(sum.x, sum.y, sum.width, sum.height, GRAY);
-					DrawRectangle(collisionAABB.x, collisionAABB.y, collisionAABB.width, collisionAABB.height, DARKGRAY);
-					DrawCircle(collisionPos.x, collisionPos.y, 10, BLUE);
+					//DrawRectangle(sum.x, sum.y, sum.width, sum.height, GRAY);
+					//DrawRectangle(collisionAABB.x, collisionAABB.y, collisionAABB.width, collisionAABB.height, DARKGRAY);
+					//DrawCircle(collisionPos.x, collisionPos.y, 10, BLUE);
 				});
 
-					DrawRectangle(cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height, GREEN);
+			DrawRectangle(cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height, GREEN);
+			DrawRectangle(closerHitPos.x - player.collision.width / 2, closerHitPos.y - player.collision.height / 2, player.collision.width, player.collision.height, PURPLE);
+
 		}
 
 		EndMode2D();

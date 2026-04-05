@@ -1,10 +1,8 @@
 #pragma once
 #include "tile.h"
 #include <vector>
-#include <functional>
 #include <string>
 #include <iostream>
-#include <optional>
 
 struct Map
 {
@@ -31,7 +29,30 @@ struct Map
 	void GenerateMap();
 	void ClearMap();
 	void GenerateMapDebug();
-	void IterateMap(std::function<void(int x, int y)> functionX, std::function<void(int y)> functionY = nullptr);
+	template<typename F1>
+	auto IterateMap(F1 functionX)
+	{
+		for (int y = 0; y < tileCountY; y++)
+		{
+			for (int x = 0; x < tileCountX; x++)
+			{
+				functionX(x, y);
+			}
+		}
+	}
+	template<typename F1, typename F2>
+	auto IterateMap(F1 functionX, F2 functionY)
+	{
+		for (int y = 0; y < tileCountY; y++)
+		{
+			functionY(y);
+
+			for (int x = 0; x < tileCountX; x++)
+			{
+				functionX(x, y);
+			}
+		}
+	}
 	void DecideTileType();
 	void ApplyPerlinNoiseY();
 	void ApplyPerlinNoiseX();

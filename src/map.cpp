@@ -51,7 +51,7 @@ void Map::GenerateMapDebug()
 	ApplyPerlinNoiseY();
 	DecideTileType();
 	ApplyPerlinNoiseX();
-	//DecideTileType();
+	DecideTileType();
 	SetTileTextures();
 	AutoTile();
 }
@@ -62,19 +62,6 @@ void Map::ClearMap()
 		{
 			map[y][x].type = AIR;
 		});
-}
-
-void Map::IterateMap(std::function<void(int x, int y)> functionX, std::function<void(int y)> functionY)
-{
-	for (int y = 0; y < tileCountY; y++)
-	{
-		if (functionY) functionY(y);
-
-		for (int x = 0; x < tileCountX; x++)
-		{
-			functionX(x, y);
-		}
-	}
 }
 
 void Map::DecideTileType()
