@@ -54,7 +54,7 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	float bRight = b.x + b.width;
 	float bTop = b.y;
 	float bBottom = b.y + b.height;
-	
+
 	//0 LEFT, 
 	// 1 RIGHT, 
 	// 2 UP, 
@@ -62,28 +62,32 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	switch (collisionDirection)
 	{
 	case(0):
- 		p.position.x = bRight + a.width / 2;
-
-		if (p.velocity.x < 0) //if going left
-		p.velocity.x = 0;
+		if (p.velocity.x < 0.f) //if going left
+		{
+			p.position.x = bRight + a.width / 2;
+			p.velocity.x = 0.f;
+		}
 		break;
 	case(1):
-		p.position.x = bLeft - a.width / 2;
-
-		if (p.velocity.x > 0) //if going right
-		p.velocity.x = 0;
+		if (p.velocity.x > 0.f) //if going right
+		{
+			p.velocity.x = 0.f;
+			p.position.x = bLeft - a.width / 2;
+		}
 		break;
 	case(2):
-		p.position.y = bBottom + a.height / 2;
-
-		if (p.velocity.y < 0) //if jumping
-		p.velocity.y = 0;
+		if (p.velocity.y < 0.f) //if jumping
+		{
+			p.position.y = bBottom + a.height / 2;
+			p.velocity.y = 0.f;
+		}
 		break;
 	case(3):
-		p.position.y = bTop - a.height / 2;
-
-		if (p.velocity.y > 0) //if falling
-		p.velocity.y = 0;
+		if (p.velocity.y > 0.f) //if falling
+		{
+			p.position.y = bTop - a.height / 2;
+			p.velocity.y = 0.f;
+		}
 		break;
 
 	default:
@@ -91,4 +95,42 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	}
 
 	p.AdjustCollider();
+}
+
+Hit ShapecastAABB(float startingPos[DIMENSIONS], float magnitude[DIMENSIONS], float collision[DIMENSIONS * 2])
+{
+	Hit hit = {};
+	
+	float lastEntry = -INFINITY;
+	float firstExit = INFINITY;
+
+	float min[DIMENSIONS] = { collision[0], collision[1] };
+	float max[DIMENSIONS] = { collision[0] + collision[0 + DIMENSIONS], collision[1] + collision[1 + DIMENSIONS] };
+
+	for (int i = 0; i < DIMENSIONS; i++)
+	{
+		if (magnitude[i] != 0)
+		{
+			float t1 = (min[i] - startingPos[i]) / magnitude[i];
+			float t2 = (max[i] - startingPos[i]) / magnitude[i];
+
+			lastEntry = std::max(lastEntry, std::min(t1, t2));
+			firstExit = std::min(firstExit, std::max(t1, t2));
+		}
+		else if (startingPos[i] <= min[i] || startingPos[i] >= max[i])
+		{
+			return hit;
+		}
+	}
+
+	if (firstExit > lastEntry && firstExit > 0.f && lastEntry < 1.f) //if hit
+	{
+		hit.position.x = startingPos[0] + magnitude[0] * lastEntry;
+		hit.position.y = startingPos[1] + magnitude[1] * lastEntry;
+
+		hit.isHit = true;
+		hit.time = lastEntry;
+	}
+
+	return hit;
 }

@@ -124,18 +124,52 @@ int main()
 		// drawing
 		BeginDrawing();
 
-			// Setup the back buffer for drawing (clear color and depth buffers)
-			ClearBackground(SKYBLUE);
-		
-			BeginMode2D(camera);
-				
-				camera.target = player.position;
+		// Setup the back buffer for drawing (clear color and depth buffers)
+		ClearBackground(SKYBLUE);
 
-				map.DrawMap();
-				//map.DrawGrid();
-				player.Draw();
+		BeginMode2D(camera);
 
-			EndMode2D();
+		camera.target = player.position;
+
+		map.DrawMap();
+		map.DrawGrid();
+		player.Draw();
+
+		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+		{
+			Rectangle collisionAABB = { 0.f, -((float)tileCountY / 3 * (float)tileHeight), 100.f, 100.f };
+			Vector2 collisionPos = { collisionAABB.x + collisionAABB.width / 2, collisionAABB.y + collisionAABB.height / 2 };
+
+			Vector2 cursorPos = GetScreenToWorld2D(GetMousePosition(), camera);
+			Vector2 cursorCollisionPos = cursorPos - Vector2{ player.collision.width / 2,  player.collision.height / 2 };
+			Rectangle cursorCollision = { cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height };
+
+			Vector2 magnitudeVector = { cursorPos - Vector2{player.position.x, player.position.y} };
+
+			Vector2 sumPos = collisionPos;
+			Rectangle sum = { sumPos.x, sumPos.y, (collisionAABB.width / 2 + cursorCollision.width / 2) * 2, (collisionAABB.height / 2 + cursorCollision.width / 2) * 2 };
+			sum.x -= sum.width / 2;
+			sum.y -= sum.height / 2;
+
+			float startPos[DIMENSIONS] = { player.position.x, player.position.y };
+			float magnitude[DIMENSIONS] = { magnitudeVector.x, magnitudeVector.y };
+			float collisionSum[DIMENSIONS * 2] = { sum.x, sum.y, sum.width, sum.height };
+			Hit hit = ShapecastAABB(startPos, magnitude, collisionSum);
+			if (hit.isHit)
+			{
+				std::cout << "shapecast" << std::endl;
+				DrawRectangle(hit.position.x - player.collision.width / 2, hit.position.y - player.collision.height / 2, player.collision.width, player.collision.height, RED);
+				DrawLine(startPos[0], startPos[1], hit.position.x, hit.position.y, RED);
+			}
+
+			DrawRectangle(cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height, GREEN);
+			DrawRectangle(sum.x, sum.y, sum.width, sum.height, GRAY);
+			DrawRectangle(collisionAABB.x, collisionAABB.y, collisionAABB.width, collisionAABB.height, DARKGRAY);
+			DrawCircle(collisionPos.x, collisionPos.y, 10, BLUE);
+
+		}
+
+		EndMode2D();
 
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
