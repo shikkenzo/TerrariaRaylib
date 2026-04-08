@@ -13,4 +13,4 @@ struct Hit
 };
 
 constexpr int DIMENSIONS = 2;
-Hit ShapecastAABB(float startingPos[DIMENSIONS], float magnitude[DIMENSIONS], float collision[DIMENSIONS * 2]);
+Hit ShapecastAABB(Vector2 startingPos, Vector2 targetPos, Rectangle collision);

@@ -1,5 +1,13 @@
 #include "collisionSystem.h"
 
+enum Direction
+{
+	LEFT = 0,
+	RIGHT,
+	UP,
+	DOWN
+};
+
 bool CheckCollisionAABB(Rectangle a, Rectangle b, int& directionOut)
 {
 	bool result = false;
@@ -61,28 +69,28 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	// 3 DOWN
 	switch (collisionDirection)
 	{
-	case(0):
+	case(LEFT):
 		if (p.velocity.x < 0.f) //if going left
 		{
 			p.position.x = bRight + a.width / 2;
 			p.velocity.x = 0.f;
 		}
 		break;
-	case(1):
+	case(RIGHT):
 		if (p.velocity.x > 0.f) //if going right
 		{
 			p.velocity.x = 0.f;
 			p.position.x = bLeft - a.width / 2;
 		}
 		break;
-	case(2):
+	case(UP):
 		if (p.velocity.y < 0.f) //if jumping
 		{
 			p.position.y = bBottom + a.height / 2;
 			p.velocity.y = 0.f;
 		}
 		break;
-	case(3):
+	case(DOWN):
 		if (p.velocity.y > 0.f) //if falling
 		{
 			p.position.y = bTop - a.height / 2;
@@ -97,27 +105,33 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	p.AdjustCollider();
 }
 
-Hit ShapecastAABB(float startingPos[DIMENSIONS], float magnitude[DIMENSIONS], float collision[DIMENSIONS * 2])
+Hit ShapecastAABB(Vector2 startingPos, Vector2 targetPos, Rectangle collision)
 {
+	Vector2 magnitudeVector = targetPos - startingPos;
+
+	float startPos[DIMENSIONS] = { startingPos.x, startingPos.y };
+	float magnitude[DIMENSIONS] = { magnitudeVector.x, magnitudeVector.y };
+	float collisionSum[DIMENSIONS * 2] = { collision.x, collision.y, collision.width, collision.height };
+
 	Hit hit = {};
 	
 	float lastEntry = -INFINITY;
 	float firstExit = INFINITY;
 
-	float min[DIMENSIONS] = { collision[0], collision[1] };
-	float max[DIMENSIONS] = { collision[0] + collision[0 + DIMENSIONS], collision[1] + collision[1 + DIMENSIONS] };
+	float min[DIMENSIONS] = { collisionSum[0], collisionSum[1] };
+	float max[DIMENSIONS] = { collisionSum[0] + collisionSum[0 + DIMENSIONS], collisionSum[1] + collisionSum[1 + DIMENSIONS] };
 
 	for (int i = 0; i < DIMENSIONS; i++)
 	{
 		if (magnitude[i] != 0)
 		{
-			float t1 = (min[i] - startingPos[i]) / magnitude[i];
-			float t2 = (max[i] - startingPos[i]) / magnitude[i];
+			float t1 = (min[i] - startPos[i]) / magnitude[i];
+			float t2 = (max[i] - startPos[i]) / magnitude[i];
 
 			lastEntry = std::max(lastEntry, std::min(t1, t2));
 			firstExit = std::min(firstExit, std::max(t1, t2));
 		}
-		else if (startingPos[i] <= min[i] || startingPos[i] >= max[i])
+		else if (startPos[i] <= min[i] || startPos[i] >= max[i])
 		{
 			return hit;
 		}
@@ -125,8 +139,8 @@ Hit ShapecastAABB(float startingPos[DIMENSIONS], float magnitude[DIMENSIONS], fl
 
 	if (firstExit > lastEntry && firstExit > 0.f && lastEntry < 1.f) //if hit
 	{
-		hit.position.x = startingPos[0] + magnitude[0] * lastEntry;
-		hit.position.y = startingPos[1] + magnitude[1] * lastEntry;
+		hit.position.x = startPos[0] + magnitude[0] * lastEntry;
+		hit.position.y = startPos[1] + magnitude[1] * lastEntry;
 
 		hit.isHit = true;
 		hit.time = lastEntry;

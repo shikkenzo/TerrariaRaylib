@@ -322,6 +322,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\PC _ Computer - Terraria - Tiles - Dirt.png" />
+    <Image Include="resources\Terraria - Tiles - Grass.png" />
     <Image Include="resources\perlinRaylib.png" />
     <Image Include="resources\wabbit_alpha.png" />
   </ItemGroup>
