@@ -4,6 +4,7 @@
 
 bool CheckCollisionAABB(Rectangle a, Rectangle b, int& directionOut);
 void ResolvePlayerCollision(Player& p, Rectangle c, int collisionDirection);
+void ResolvePlayerCollision(Player& p, int collisionDirection);
 
 struct Hit
 {

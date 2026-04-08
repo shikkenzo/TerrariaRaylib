@@ -105,6 +105,47 @@ void ResolvePlayerCollision(Player& p, Rectangle b, int collisionDirection)
 	p.AdjustCollider();
 }
 
+void ResolvePlayerCollision(Player& p, int collisionDirection)
+{
+
+	//0 LEFT, 
+	// 1 RIGHT, 
+	// 2 UP, 
+	// 3 DOWN
+	switch (collisionDirection)
+	{
+	case(LEFT):
+		if (p.velocity.x < 0.f) //if going left
+		{
+			p.velocity.x = 0.f;
+		}
+		break;
+	case(RIGHT):
+		if (p.velocity.x > 0.f) //if going right
+		{
+			p.velocity.x = 0.f;
+		}
+		break;
+	case(UP):
+		if (p.velocity.y < 0.f) //if jumping
+		{
+			p.velocity.y = 0.f;
+		}
+		break;
+	case(DOWN):
+		if (p.velocity.y > 0.f) //if falling
+		{
+			p.velocity.y = 0.f;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	p.AdjustCollider();
+}
+
 Hit ShapecastAABB(Vector2 startingPos, Vector2 targetPos, Rectangle collision)
 {
 	Vector2 magnitudeVector = targetPos - startingPos;
