@@ -168,14 +168,16 @@ void Map::ApplyPerlinNoiseX()
 	//);
 }
 
-void Map::DrawMap()
+void Map::DrawMap(Rectangle cullingRect)
 {
-	IterateMap([this](int x, int y)
+	IterateMap([this, cullingRect](int x, int y)
 		{
 			Tile& tile = map[y][x];
 
 			tile.drawingPosX = startPos.x + tile.x * tileWidth + (1 / 2) * tileWidth;
 			tile.drawingPosY = startPos.y + tile.y * tileHeight + (1 / 2) * tileHeight;
+
+			if (!CheckCollisionRecs(tile.collision, cullingRect)) return;
 
 			if (tile.type != AIR)
 			{

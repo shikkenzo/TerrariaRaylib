@@ -56,7 +56,7 @@ struct Map
 	void DecideTileType();
 	void ApplyPerlinNoiseY();
 	void ApplyPerlinNoiseX();
-	void DrawMap();
+	void DrawMap(Rectangle cullingRect);
 	void GetAdjacentTiles(Tile tile, Tile& outTop, Tile& outBottom, Tile& outLeft, Tile& outRight);
 	bool CheckTile(int x, int y);
 	void AutoTile();

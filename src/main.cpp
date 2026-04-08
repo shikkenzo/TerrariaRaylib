@@ -61,7 +61,7 @@ int main()
 
 	constexpr float maxDeltaTime = 0.033f;
 
-	SetTargetFPS(30);
+	SetTargetFPS(300);
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
@@ -275,7 +275,25 @@ int main()
 
 		camera.target = player.position;
 
-		map.DrawMap();
+		//Camera World Rectangle
+		float currentZoom = camera.zoom;
+		camera.zoom = 1.f;
+
+		Vector2 topLeft = GetScreenToWorld2D({ 0, 0 }, camera);
+		Vector2 bottomRight = GetScreenToWorld2D({
+			(float)GetScreenWidth(),
+			(float)GetScreenHeight()
+			}, camera);
+
+		Rectangle rect;
+		rect.x = topLeft.x;
+		rect.y = topLeft.y;
+		rect.width = bottomRight.x - topLeft.x;
+		rect.height = bottomRight.y - topLeft.y;
+
+		camera.zoom = currentZoom;
+
+		map.DrawMap(rect);
 		map.DrawGrid();
 		player.Draw();
 
