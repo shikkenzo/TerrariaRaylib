@@ -1,5 +1,6 @@
 #pragma once
 #include "tile.h"
+#include "autoTiler.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -66,11 +67,9 @@ struct Map
 	Vector2 GetPosFromTile(int x, int y);
 	void DrawGrid();
 
-	//RULES
 	int horizonLine = 50;
 	std::vector<int> horizon;
 
 private:
-	Vector2 CheckAutoTileRules(int x, int y);
 	TileType CheckGenerationRules(int x, int y);
 };

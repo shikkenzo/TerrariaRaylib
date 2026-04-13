@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\autoTiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\collisionSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -32,6 +35,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\autoTiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\collisionSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

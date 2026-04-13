@@ -301,6 +301,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\autoTiler.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\collisionSystem.h" />
     <ClInclude Include="include\map.h" />
     <ClInclude Include="include\player.h" />
@@ -308,6 +312,7 @@
     <ClInclude Include="include\tile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\autoTiler.cpp" />
     <ClCompile Include="src\collisionSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\map.cpp" />

@@ -51,12 +51,12 @@ int main()
 	map.GenerateMapDebug();
 
 	Player player;
-	player.MoveTo({ 0.f, -((float)tileCountY * (float)tileHeight) });
+	player.MoveTo({ 0.f, -((float)tileCountY / 3 * (float)tileHeight) });
 
 	Camera2D camera = { 0 };
 	camera.offset = { (screenWidth / 2.f), (screenHeight / 2.f) };
 	camera.rotation = 0.0f;
-	camera.zoom = 0.75f;
+	camera.zoom = 1.f;
 	camera.target = player.position;
 
 	constexpr float maxDeltaTime = 0.033f;
@@ -66,7 +66,7 @@ int main()
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
 		float deltaTime = std::min(GetFrameTime(), maxDeltaTime);
-		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 		{
 			Vector2 p = GetScreenToWorld2D(GetMousePosition(), camera);
 
@@ -77,6 +77,8 @@ int main()
 			{
 				std::cout << x << " + " << y << ", " << map.map[y][x].type << ", " << map.map[y][x].collidable << std::endl;
 				//std::cout << map.horizon[i++] << std::endl;
+				map.map[y][x].type = AIR;
+				map.AutoTile();
 			}
 		}
 
@@ -276,7 +278,7 @@ int main()
 		camera.target = player.position;
 
 		//Camera World Rectangle
-		float currentZoom = camera.zoom;
+		float currentZoom = std::min(camera.zoom, 1.f);
 		camera.zoom = 1.f;
 
 		Vector2 topLeft = GetScreenToWorld2D({ 0, 0 }, camera);
@@ -294,7 +296,7 @@ int main()
 		camera.zoom = currentZoom;
 
 		map.DrawMap(rect);
-		map.DrawGrid();
+		//map.DrawGrid();
 		player.Draw();
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))

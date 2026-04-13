@@ -191,7 +191,20 @@ void Map::AutoTile()
 	IterateMap([this](int x, int y)
 		{
 			Tile& tile = map[y][x];
-			tile.tileAtlasPos = CheckAutoTileRules(x, y);
+
+			Tile t, b, l, r;
+			GetAdjacentTiles(tile, t, b, l, r);
+
+			int mask = ComputeMask(
+				tile.type,
+				t.type,
+				r.type,
+				b.type,
+				l.type
+			);
+
+			tile.shape = GetShapeFromMask(mask);
+			tile.tileAtlasPos = GetUV(tile.type, tile.shape, x, y);
 		});
 }
 
@@ -201,16 +214,12 @@ void Map::GetAdjacentTiles(Tile tile, Tile& outTop, Tile& outBottom, Tile& outLe
 	int y = tile.y;
 
 	if (y > 0) outTop = map[y - 1][x];
-	else outTop.valid = 0;
 
 	if (y < tileCountY - 1) outBottom = map[y + 1][x];
-	else outBottom.valid = 0;
 
 	if (x > 0) outLeft = map[y][x - 1];
-	else outLeft.valid = 0;
 
 	if (x < tileCountX - 1) outRight = map[y][x + 1];
-	else outRight.valid = 0;
 }
 
 bool Map::CheckTile(int x, int y)
@@ -222,79 +231,6 @@ bool Map::CheckTile(int x, int y)
 		x >= tileCountX
 		)
 		return false;
-}
-
-Vector2 Map::CheckAutoTileRules(int x, int y)
-{
-	Tile tile = map[y][x];
-	Tile t;
-	Tile b;
-	Tile l;
-	Tile r;
-
-	GetAdjacentTiles(tile, t, b, l, r);
-
-	TileType top = t.type;
-	TileType bottom = b.type;
-	TileType left = l.type;
-	TileType right = r.type;
-
-	if (tile.type == DIRT)
-	{
-		if (top == AIR && left == DIRT && right == DIRT)
-		{
-			return { 1, 0 };
-		}
-		else if (top == AIR && left == DIRT && right == AIR)
-		{
-			return { 1, 3 };
-		}
-		else if (top == AIR && left == AIR && right == DIRT)
-		{
-			return { 0, 3 };
-		}
-		else
-		{
-			return { 0, 5 };
-		}
-	}
-	else if (tile.type == GRASS)
-	{
-		if (top == AIR && left == GRASS && right == GRASS && bottom == DIRT)
-		{
-			return { 1, 0 };
-		}
-		else if (top == AIR && left == GRASS && right == AIR && bottom == DIRT)
-		{
-			return { 1, 3 };
-		}
-		else if (top == AIR && left == AIR && right == GRASS && bottom == DIRT)
-		{
-			return { 0, 3 };
-		}
-
-		else if (top == AIR && left == GRASS && right == DIRT && bottom == DIRT)
-		{
-			return { 1, 0 };
-		}
-		else if (top == AIR && left == DIRT && right == GRASS && bottom == DIRT)
-		{
-			return { 1, 0 };
-		}
-		else if (top == AIR && left == AIR && right == AIR && bottom == DIRT)
-		{
-			return { 6, 5 };
-		}
-
-		else
-		{
-			return { 1, 1 };
-		}
-	}
-	else
-	{
-		return { 0, 0 };
-	}
 }
 
 void Map::SetTileTextures()
