@@ -34,6 +34,7 @@ int main()
 
 	Texture dirtAtlas = LoadTexture("PC _ Computer - Terraria - Tiles - Dirt.png");
 	Texture grassAtlas = LoadTexture("Terraria - Tiles - Grass.png");
+	Texture background = LoadTexture("Map_Background_Sky.png");
 
 
 	SendTextures({ dirtAtlas, grassAtlas });
@@ -295,10 +296,13 @@ int main()
 
 		camera.zoom = currentZoom;
 
+		DrawTexturePro(background, { 0, 0, (float)background.width, (float)background.height }, { topLeft.x - 10, topLeft.y - 10, (bottomRight.x - topLeft.x) + 10,  (bottomRight.y - topLeft.y) + 10 }, { 0, 0 }, 0, WHITE);
+
 		map.DrawMap(rect);
 		//map.DrawGrid();
 		player.Draw();
 
+		//DEBUG //!
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
 			/*Rectangle collisionAABB = { 0.f, -((float)tileCountY / 3 * (float)tileHeight), 100.f, 100.f };
@@ -336,8 +340,9 @@ int main()
 					//DrawCircle(collisionPos.x, collisionPos.y, 10, BLUE);
 				});
 			DrawRectangle(cursorCollisionPos.x, cursorCollisionPos.y, player.collision.width, player.collision.height, GREEN);
-
 		}
+		//DEBUG END //!
+
 
 		//if (wasHit)
 			//DrawRectangle(closerHitPosX.x - player.collision.width / 2, closerHitPos.y - player.collision.height / 2, player.collision.width, player.collision.height, PURPLE);
