@@ -42,7 +42,7 @@ int main()
 	int tileCountY = 300;
 	int horizonBase = tileCountY / 2;
 	int tileWidth = 16;
-	int tileHeight = 15;
+	int tileHeight = 16;
 	Vector2 startPos = { -(tileWidth * tileCountX / 2.f), -(tileHeight * tileCountY / 2.f) };
 	float perlinStrength = 150.f;
 

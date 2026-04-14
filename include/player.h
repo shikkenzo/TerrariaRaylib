@@ -5,10 +5,10 @@
 
 struct Player
 {
-	Rectangle collision = { 0, 0, 20.f, 20.f };
+	Rectangle collision = { 0, 0, 25.f, 50.f };
 	Vector2 position = { 0.f, 0.f };
 	float baseSpeed = 500.f;
-	float jumpSpeed = 4.f;
+	float jumpSpeed = 4.5f;
 	bool canJump = false;
 	bool isGrounded = false;
 	float baseFallingAccel = 9.8f;
