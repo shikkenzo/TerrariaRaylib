@@ -1,6 +1,6 @@
 # Terraria Clone
 A small Terraria-style clone I'm working on using Raylib, C++, and Premake.
-<img width="1274" height="788" alt="image" src="https://github.com/user-attachments/assets/b66e201e-6df9-4540-b914-71f8bea75d4f" />
+<img width="1274" height="788" alt="image" src="https://github.com/shikkenzo/TerrariaRaylib/blob/main/RESOURCES/GameScreenshot.png" />
 
 # Technologies 
 Raylib Quickstart: https://github.com/raylib-extras/raylib-quickstart
