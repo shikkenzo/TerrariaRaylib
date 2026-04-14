@@ -1,5 +1,6 @@
 # Terraria Clone
-A small Terraria-style clone I'm working on using Premake, C++, and Raylib.
+A small Terraria-style clone I'm working on using Raylib, C++, and Premake.
+<img width="1274" height="788" alt="image" src="https://github.com/user-attachments/assets/b66e201e-6df9-4540-b914-71f8bea75d4f" />
 
 # Technologies 
 Raylib Quickstart: https://github.com/raylib-extras/raylib-quickstart
@@ -9,6 +10,11 @@ Raylib Quickstart: https://github.com/raylib-extras/raylib-quickstart
 - Procedural map generation
 - AABB continuous collision detection and resolution
 - Autotiling system
+
+# Controls
+- W, A, S, D: movement keys
+- Right Mouse Click: CCD Shapecast Preview
+- Left Mouse Click: convert tile to air
 
 # The Process
 For the initial setup, as mentioned before, I used the Raylib Quickstart repository as a base. After getting everything ready, I began exploring the basics of Raylib and tried displaying a dirt tile texture on the screen. Once that was working, I moved on to implementing basic procedural map generation, using Raylib’s Perlin noise.
