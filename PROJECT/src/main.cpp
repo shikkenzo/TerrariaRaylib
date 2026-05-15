@@ -15,6 +15,7 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "map.h"
 #include "player.h"
 #include "collisionSystem.h"
+#include "AssetManager.h"
 
 constexpr bool DEBUG_MOVEMENT = false;
 
@@ -37,7 +38,7 @@ int main()
 	Texture background = LoadTexture("Map_Background_Sky.png");
 
 
-	SendTextures({ dirtAtlas, grassAtlas });
+	SendTileTextures({ dirtAtlas, grassAtlas });
 
 	int tileCountX = 350;
 	int tileCountY = 300;

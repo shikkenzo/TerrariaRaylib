@@ -1,4 +1,5 @@
 #include "tile.h"
+#include "AssetManager.h"
 
 void Tile::DrawTile(Vector2 pos)
 {
@@ -9,7 +10,7 @@ void Tile::SetTexture()
 {
 	if (type != AIR)
 	{
-		tileTexture = textures[type];
+		tileTexture = GetTileTextures()[type];
 	}
 }
 
@@ -31,13 +32,5 @@ void Tile::SetCollision(Rectangle tileCollision)
 	else
 	{
 		collision = {};
-	}
-}
-
-void SendTextures(std::vector<Texture> t)
-{
-	for (int i = 0; i < std::size(t); i++)
-	{
-		textures.push_back(t[i]);
 	}
 }

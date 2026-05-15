@@ -39,9 +39,6 @@ enum TileShape
 	SHAPE_1111_CROSS
 };
 
-static std::vector<Texture> textures;
-void SendTextures(std::vector<Texture> t = {});
-
 struct Tile
 {
 	TileType type = AIR;
